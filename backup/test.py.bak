@@ -1,0 +1,100 @@
+#!/usr/bin/env python
+
+# NECESSARY MODULES:
+
+from utils import *
+from player_and_game import *
+from PIL import Image
+from matplotlib import rcParams
+rcParams['figure.figsize'] = (6, 6)
+rcParams['figure.dpi'] = 150
+
+import math
+import random
+import numpy as np
+import matplotlib.pyplot as plt
+import copy
+import time
+
+# Parameters for BOARD:
+BOARD_ROW = 20 
+BOARD_COL = 20
+
+#def run_test(first, second, third, fourth, DEBUG):
+def run_test(DEBUG):
+    choice = "A"
+
+    if choice == "A":
+        computer = Player("X", "Computer_A_R", Random_Player)
+    elif choice == "B":
+        computer = Greedy("X", "Computer_A_G", Greedy_Player, [2, 1, 5, 1, 1])
+    else:
+        computer = Greedy("X", "Computer_A_M", Minimax_Player, [3, 1, 8, 1, 1])
+
+    first = computer
+    #second = Greedy("B", "Computer_B", Minimax_Player, [2,1,30,1,1])
+    second = Player("B", "Computer_C", Random_Player)
+    third = Greedy("Y", "Computer_B", Greedy_Player, [2,1,30,1,1])
+    fourth = Player("D", "Computer_D", Random_Player)
+
+    standard_size = Board(BOARD_COL, BOARD_ROW, "_")
+
+    ordering = [first, second, third, fourth]
+    #random.shuffle(ordering)
+    userblokus = Blokus(ordering, standard_size, All_Shapes)
+
+    # <codecell>
+
+    userblokus.board.print_board(num = userblokus.rounds, fancy = False)
+    print "\n"
+    userblokus.play()
+    userblokus.board.print_board(num = userblokus.rounds, fancy = False)
+    print "\n"
+
+    USER_SAYS_DONE = False
+
+    # record_dict store "total time", "avg time", "score", "winning place", "player info" for each player.
+    record_dict = {}
+    # Init time_dict.
+    for p in userblokus.players:
+        print(p.name)
+        record = {}
+        record["total_time"] = 0
+        record_dict[p.name] = 0
+
+    while userblokus.winner() == "None" or not USER_SAYS_DONE:
+        current_player = userblokus.players[0]
+        print("This is current player : "+current_player.name)
+        # Measure time taken for current player.
+        start = time.time()
+        userblokus.play()
+        end = time.time()
+        # Store time taken for current player.
+        time_dict[current_player.name] = end - start
+        # Debug
+        if DEBUG:
+            print(end - start)
+        
+        userblokus.board.print_board(num = userblokus.rounds, fancy = False)
+        print "\n"
+        for p in userblokus.players:
+            print p.name + " (" + str(p.score) + ") : " + str([s.ID for s in p.pieces])
+            print
+        print "======================================================================="
+    
+    print
+    userblokus.board.print_board()
+    print
+    userblokus.play()
+
+    print "The final scores are..."
+
+    by_name = sorted(userblokus.players, key = lambda player: player.name)
+
+    for p in by_name:
+        print p.name + " : " + str(p.score)
+
+second = Player("B", "Computer_C", Random_Player)
+third = Greedy("Y", "Computer_B", Greedy_Player, [2,1,30,1,1])
+fourth = Player("D", "Computer_D", Random_Player)
+#serun_test(True)
